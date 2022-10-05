@@ -256,6 +256,8 @@ typedef struct Mats {
     int length;
 } Mats;
 
+struct Mats Mats_New(int length);
+
 Mat Mats_get(struct Mats mats, int i);
 struct DMatches MultiDMatches_get(struct MultiDMatches mds, int index);
 

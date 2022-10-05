@@ -821,6 +821,13 @@ struct DMatches MultiDMatches_get(struct MultiDMatches mds, int index) {
     return mds.dmatches[index];
 }
 
+struct Mats Mats_New(int length) {
+  struct Mats mats;
+  mats.length = length;
+  mats.mats = new Mat[length];
+  return mats;
+}
+
 // since it is next to impossible to iterate over mats.mats on the cgo side
 Mat Mats_get(struct Mats mats, int i) {
     return mats.mats[i];

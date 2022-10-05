@@ -114,7 +114,8 @@ void Net_GetLayerNames(Net net, CStrings* names) {
     const char **strs = new const char*[cstrs.size()];
 
     for (size_t i = 0; i < cstrs.size(); ++i) {
-        strs[i] = cstrs[i].c_str();
+        strs[i] = new char[cstrs[i].length() + 1];
+        strcpy((char *)strs[i], cstrs[i].c_str());
     }
 
     names->length = cstrs.size();
