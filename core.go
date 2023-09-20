@@ -1219,6 +1219,20 @@ func EigenNonSymmetric(src Mat, eigenvalues *Mat, eigenvectors *Mat) {
 	C.Mat_EigenNonSymmetric(src.p, eigenvalues.p, eigenvectors.p)
 }
 
+// PCACompute performs PCA.
+//
+// The computed eigenvalues are sorted from the largest to the smallest and the corresponding
+// eigenvectors are stored as eigenvectors rows.
+//
+// Note: Calling with maxComponents == 0 (opencv default) will cause all components to be retained.
+//
+// For further details, please see:
+// https://docs.opencv.org/4.x/d2/de8/group__core__array.html#ga27a565b31d820b05dcbcd47112176b6e
+//
+func PCACompute(src Mat, mean *Mat, eigenvectors *Mat, eigenvalues *Mat, maxComponents int) {
+	C.Mat_PCACompute(src.p, mean.p, eigenvectors.p, eigenvalues.p, C.int(maxComponents))
+}
+
 // Exp calculates the exponent of every array element.
 //
 // For further details, please see:
@@ -1755,6 +1769,24 @@ const (
 //
 func Reduce(src Mat, dst *Mat, dim int, rType ReduceTypes, dType MatType) {
 	C.Mat_Reduce(src.p, dst.p, C.int(dim), C.int(rType), C.int(dType))
+}
+
+// Finds indices of max elements along provided axis.
+//
+// For further details, please see:
+// https://docs.opencv.org/master/d2/de8/group__core__array.html#gaa87ea34d99bcc5bf9695048355163da0
+//
+func ReduceArgMax(src Mat, dst *Mat, axis int, lastIndex bool) {
+	C.Mat_ReduceArgMax(src.p, dst.p, C.int(axis), C.bool(lastIndex))
+}
+
+// Finds indices of min elements along provided axis.
+//
+// For further details, please see:
+// https://docs.opencv.org/master/d2/de8/group__core__array.html#gaeecd548276bfb91b938989e66b722088
+//
+func ReduceArgMin(src Mat, dst *Mat, axis int, lastIndex bool) {
+	C.Mat_ReduceArgMin(src.p, dst.p, C.int(axis), C.bool(lastIndex))
 }
 
 // Repeat fills the output array with repeated copies of the input array.
@@ -2590,6 +2622,7 @@ func (buffer *NativeByteBuffer) Len() int {
 func (buffer *NativeByteBuffer) Close() {
 	C.StdByteVectorFree(buffer.nativePointer())
 }
+
 // Points2fVector is a wrapper around a std::vector< std::vector< cv::Point2f > >*
 type Points2fVector struct {
 	p C.Points2fVector
@@ -2604,7 +2637,7 @@ func NewPoints2fVector() Points2fVector {
 // initialized to a slice of slices of Point2f.
 func NewPoints2fVectorFromPoints(pts [][]Point2f) Points2fVector {
 	pvf := NewPoints2fVector()
-	for j := 0;j<len(pts);j++{
+	for j := 0; j < len(pts); j++ {
 		pv := NewPoint2fVectorFromPoints(pts[j])
 		pvf.Append(pv)
 		pv.Close()
@@ -2619,7 +2652,7 @@ func (pvs Points2fVector) P() C.Points2fVector {
 // ToPoints returns a slice of slices of Point2f for the data in this Points2fVector.
 func (pvs Points2fVector) ToPoints() [][]Point2f {
 	ppoints := make([][]Point2f, pvs.Size())
-	for j := 0;j < pvs.Size();j++{
+	for j := 0; j < pvs.Size(); j++ {
 		pts := pvs.At(j)
 		points := pts.ToPoints()
 		ppoints[j] = points
@@ -2642,7 +2675,7 @@ func (pvs Points2fVector) At(idx int) Point2fVector {
 	if idx > pvs.Size() {
 		return Point2fVector{}
 	}
-	return Point2fVector{p : C.Points2fVector_At(pvs.p, C.int(idx))}
+	return Point2fVector{p: C.Points2fVector_At(pvs.p, C.int(idx))}
 }
 
 // Append appends a Point2fVector at end of the Points2fVector.
@@ -2736,7 +2769,7 @@ func (pfv Point3fVector) Append(point Point3f) {
 		x: C.float(point.X),
 		y: C.float(point.Y),
 		z: C.float(point.Z),
-	});
+	})
 }
 
 // ToPoints returns a slice of Point3f for the data in this Point3fVector.
@@ -2767,7 +2800,7 @@ func NewPoints3fVector() Points3fVector {
 // initialized to a slice of slices of Point3f.
 func NewPoints3fVectorFromPoints(pts [][]Point3f) Points3fVector {
 	pvf := NewPoints3fVector()
-	for j := 0;j<len(pts);j++{
+	for j := 0; j < len(pts); j++ {
 		pv := NewPoint3fVectorFromPoints(pts[j])
 		pvf.Append(pv)
 		pv.Close()
@@ -2778,7 +2811,7 @@ func NewPoints3fVectorFromPoints(pts [][]Point3f) Points3fVector {
 // ToPoints returns a slice of slices of Point3f for the data in this Points3fVector.
 func (pvs Points3fVector) ToPoints() [][]Point3f {
 	ppoints := make([][]Point3f, pvs.Size())
-	for j := 0;j < pvs.Size();j++{
+	for j := 0; j < pvs.Size(); j++ {
 		pts := pvs.At(j)
 		points := pts.ToPoints()
 		ppoints[j] = points
@@ -2801,7 +2834,7 @@ func (pvs Points3fVector) At(idx int) Point3fVector {
 	if idx > pvs.Size() {
 		return Point3fVector{}
 	}
-	return Point3fVector{p : C.Points3fVector_At(pvs.p, C.int(idx))}
+	return Point3fVector{p: C.Points3fVector_At(pvs.p, C.int(idx))}
 }
 
 // Append appends a Point3fVector at end of the Points3fVector.
@@ -2814,4 +2847,14 @@ func (pvs Points3fVector) Append(pv Point3fVector) {
 // Close closes and frees memory for this Points3fVector.
 func (pvs Points3fVector) Close() {
 	C.Points3fVector_Close(pvs.p)
+}
+
+// Set the number of threads for OpenCV.
+func SetNumThreads(n int) {
+	C.SetNumThreads(C.int(n))
+}
+
+// Get the number of threads for OpenCV.
+func GetNumThreads() int {
+	return int(C.GetNumThreads())
 }

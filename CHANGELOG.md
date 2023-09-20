@@ -1,3 +1,89 @@
+0.34.0
+---
+* **all**
+    * Add support for OpenCV 4.8.0
+    * Add support for Go 1.21
+* **build**
+    * update all builds to use OpenCV 4.8.0
+* **core**
+    * Adds support for PCACompute
+* **docker**
+    * add dockerfile for OpenCV static build
+* **make**
+    * Leave one processor free instead of using all of them when building
+
+
+0.33.0
+---
+* **bugfix**
+    * Remove opencv2/aruco.hpp include
+* **all**
+    * build performance tests with all OpenCV builds
+* **build**
+    * build and push Ubuntu 22.04 base image with OpenCV 4.7.0
+    * docker images with opencv
+    * docker production images with opencv 4.7.0
+    * Docker push to GHCR
+* **core**
+    * Add ReduceArgMax and ReduceArgMin
+* **dnn**
+    * improved NMSBoxes code
+* **docker**
+    * add dockerfile for Ubuntu 22.04 OpenCV base image
+    * updates to migrate to GHCR
+* **examples**
+    * Deallocate Mats in feature-matching example.
+    * Fix G108 (CWE-200) and G114 (CWE-676)
+    * Fix G304 (CWE-22) and G307 (CWE-703)
+    * Fix G304 (CWE-22) and G307 (CWE-703)
+    * Missed #nosec tag
+* **make**
+    * Ubuntu Jammy (22) opencv build support.
+
+
+0.32.0
+---
+* **all**
+    * update to OpenCV 4.7.0
+* **core**
+    * Add the number of thread setter and getter
+* **calib3d**
+    * add EstimateAffinePartial2DWithParams()
+* **imgcodecs**
+    * Add IMDecodeIntoMat to reduce heap allocations (#1035)
+* **imgproc**
+    * add matchShapes function support
+* **objdetect**
+    * move aruco from contrib and also refactor/update to match current OpenCV API
+* **photo**
+    * add inpaint function
+* **video**
+    * cv::KalmanFilter bindings.
+* **cuda**
+    * add support for cuda::TemplateMatching
+* **docker**
+    * update all dockerfiles for OpenCV 4.7.0/GoCV 0.32.0
+    * multiplatform for both amd64 and arm64
+    * install libjpeg-turbo into docker image
+    * add Ubunutu 18.04 and 20.04 prebuilt OpenCV images
+    * add dockerfile for older version of CUDA for those who cannot upgrade
+* **ci**
+    * remove circleci
+    * correct actions that trigger build
+* **make**
+    * change download path for OpenCV release tag
+* **windows**
+    * Update win_build_opencv.cmd
+* **docs**
+    * correct docs on building docker
+    * update ROADMAP
+    * typo in comment
+    * update comments style with gofmt
+* **openvino**
+    * Add openvino Dockerfile
+    * Fix OpenvinoVersion dangling pointer
+    * Update env.sh and README.md for 2022.1
+
 0.31.0
 ---
 * **all**

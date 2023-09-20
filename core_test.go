@@ -1566,6 +1566,60 @@ func TestMatReduceToSingleColumn(t *testing.T) {
 	}
 }
 
+func TestMatReduceArgMax(t *testing.T) {
+	rows := 2
+	cols := 3
+	src := NewMatWithSize(rows, cols, MatTypeCV8U)
+	defer src.Close()
+	dst := NewMat()
+	defer dst.Close()
+
+	for row := 0; row < rows; row++ {
+		for col := 0; col < cols; col++ {
+			src.SetUCharAt(row, col, uint8(col+1))
+		}
+	}
+
+	ReduceArgMax(src, &dst, 1, false)
+
+	sz := dst.Size()
+	if sz[0] != 2 && sz[1] != 1 {
+		t.Errorf("TestMatReduceArgMax incorrect size: %v\n", sz)
+	}
+
+	if dst.GetUCharAt(0, 0) != 2 || dst.GetUCharAt(1, 0) != 2 {
+		t.Errorf("TestMatReduceArgMax incorrect reduce result: %v at (0, 0) expected 1, %v at (1, 0) expected 1",
+			dst.GetUCharAt(0, 0), dst.GetUCharAt(1, 0))
+	}
+}
+
+func TestMatReduceArgMin(t *testing.T) {
+	rows := 2
+	cols := 3
+	src := NewMatWithSize(rows, cols, MatTypeCV8U)
+	defer src.Close()
+	dst := NewMat()
+	defer dst.Close()
+
+	for row := 0; row < rows; row++ {
+		for col := 0; col < cols; col++ {
+			src.SetUCharAt(row, col, uint8(col+1))
+		}
+	}
+
+	ReduceArgMin(src, &dst, 1, false)
+
+	sz := dst.Size()
+	if sz[0] != 2 && sz[1] != 1 {
+		t.Errorf("TestMatReduceArgMax incorrect size: %v\n", sz)
+	}
+
+	if dst.GetUCharAt(0, 0) != 0 || dst.GetUCharAt(1, 0) != 0 {
+		t.Errorf("TestMatReduceArgMax incorrect reduce result: %v at (0, 0) expected 0, %v at (1, 0) expected 0",
+			dst.GetUCharAt(0, 0), dst.GetUCharAt(1, 0))
+	}
+}
+
 func TestRepeat(t *testing.T) {
 	rows := 1
 	cols := 3
@@ -2012,6 +2066,29 @@ func TestMatEigenNonSymmetric(t *testing.T) {
 		t.Error("TestEigenNonSymmetric should not have empty eigenvectors or eigenvalues.")
 	}
 	src.Close()
+	eigenvectors.Close()
+	eigenvalues.Close()
+}
+
+func TestPCACompute(t *testing.T) {
+	src := NewMatWithSize(10, 10, MatTypeCV32F)
+	// Set some source data so the PCA is done on a non-zero matrix.
+	src.SetFloatAt(0, 0, 17)
+	src.SetFloatAt(2, 1, 5)
+	src.SetFloatAt(9, 9, 25)
+	mean := NewMat()
+	eigenvectors := NewMat()
+	eigenvalues := NewMat()
+	maxComponents := 2
+	PCACompute(src, &mean, &eigenvectors, &eigenvalues, maxComponents)
+	if mean.Empty() || eigenvectors.Empty() || eigenvalues.Empty() {
+		t.Error("TestPCACompute should not have empty eigenvectors or eigenvalues.")
+	}
+	if eigenvectors.Rows() > maxComponents {
+		t.Errorf("TestPCACompute unexpected numComponents, got=%d, want<=%d", eigenvectors.Rows(), maxComponents)
+	}
+	src.Close()
+	mean.Close()
 	eigenvectors.Close()
 	eigenvalues.Close()
 }
@@ -3043,4 +3120,25 @@ func TestElemSize(t *testing.T) {
 		t.Error("incorrect element size of MatTypeCV32SC4")
 		return
 	}
+}
+
+func TestSetThreadNumber(t *testing.T) {
+	original := GetNumThreads()
+
+	SetNumThreads(-1)
+	if num := GetNumThreads(); num != original {
+		t.Errorf("incorrect number of threads, got %d, want %d", num, original)
+	}
+
+	SetNumThreads(0)
+	if num := GetNumThreads(); num < 1 {
+		t.Errorf("incorrect number of threads, got %d, want at least 1", num)
+	}
+
+	SetNumThreads(1)
+	if num := GetNumThreads(); num != 1 {
+		t.Errorf("incorrect number of threads, got %d, want %d", num, 1)
+	}
+
+	SetNumThreads(original)
 }
