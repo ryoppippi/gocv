@@ -179,7 +179,6 @@ var ErrEmptyByteSlice = errors.New("empty byte array")
 //
 // For further details, please see:
 // http://docs.opencv.org/master/d3/d63/classcv_1_1Mat.html
-//
 type Mat struct {
 	p C.Mat
 
@@ -340,9 +339,28 @@ func (m *Mat) Empty() bool {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d3/d63/classcv_1_1Mat.html#aa90cea495029c7d1ee0a41361ccecdf3
-//
 func (m *Mat) IsContinuous() bool {
 	return bool(C.Mat_IsContinuous(m.p))
+}
+
+// Inv inverses a matrix.
+//
+// For further details, please see:
+// https://docs.opencv.org/4.x/d3/d63/classcv_1_1Mat.html#a039eb3c6740a850696a12519a4b8bfc6
+func (m *Mat) Inv() {
+	C.Mat_Inv(m.p)
+}
+
+// Col creates a matrix header for the specified matrix column.
+// The underlying data of the new matrix is shared with the original matrix.
+func (m *Mat) Col(col int) Mat {
+	return newMat(C.Mat_Col(m.p, C.int(col)))
+}
+
+// Row creates a matrix header for the specified matrix row.
+// The underlying data of the new matrix is shared with the original matrix.
+func (m *Mat) Row(row int) Mat {
+	return newMat(C.Mat_Row(m.p, C.int(row)))
 }
 
 // Clone returns a cloned full copy of the Mat.
@@ -354,7 +372,6 @@ func (m *Mat) Clone() Mat {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d3/d63/classcv_1_1Mat.html#a33fd5d125b4c302b0c9aa86980791a77
-//
 func (m *Mat) CopyTo(dst *Mat) {
 	C.Mat_CopyTo(m.p, dst.p)
 	return
@@ -364,7 +381,6 @@ func (m *Mat) CopyTo(dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d3/d63/classcv_1_1Mat.html#a626fe5f96d02525e2604d2ad46dd574f
-//
 func (m *Mat) CopyToWithMask(dst *Mat, mask Mat) {
 	C.Mat_CopyToWithMask(m.p, dst.p, mask.p)
 	return
@@ -374,7 +390,6 @@ func (m *Mat) CopyToWithMask(dst *Mat, mask Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d3/d63/classcv_1_1Mat.html#adf88c60c5b4980e05bb556080916978b
-//
 func (m *Mat) ConvertTo(dst *Mat, mt MatType) {
 	C.Mat_ConvertTo(m.p, dst.p, C.int(mt))
 	return
@@ -389,7 +404,6 @@ func (m *Mat) ConvertToWithParams(dst *Mat, mt MatType, alpha, beta float32) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d3/d63/classcv_1_1Mat.html#aa4d317d43fb0cba9c2503f3c61b866c8
-//
 func (m *Mat) Total() int {
 	return int(C.Mat_Total(m.p))
 }
@@ -398,7 +412,6 @@ func (m *Mat) Total() int {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d3/d63/classcv_1_1Mat.html#aa4d317d43fb0cba9c2503f3c61b866c8
-//
 func (m *Mat) Size() (dims []int) {
 	cdims := C.IntVector{}
 	C.Mat_Size(m.p, &cdims)
@@ -572,7 +585,6 @@ func (m *Mat) Region(rio image.Rectangle) Mat {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d3/d63/classcv_1_1Mat.html#a4eb96e3251417fa88b78e2abd6cfd7d8
-//
 func (m *Mat) Reshape(cn int, rows int) Mat {
 	return newMat(C.Mat_Reshape(m.p, C.int(cn), C.int(rows)))
 }
@@ -581,7 +593,6 @@ func (m *Mat) Reshape(cn int, rows int) Mat {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga9c25d9ef44a2a48ecc3774b30cb80082
-//
 func (m *Mat) ConvertFp16() Mat {
 	return newMat(C.Mat_ConvertFp16(m.p))
 }
@@ -589,7 +600,6 @@ func (m *Mat) ConvertFp16() Mat {
 // Mean calculates the mean value M of array elements, independently for each channel, and return it as Scalar
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga191389f8a0e58180bb13a727782cd461
-//
 func (m *Mat) Mean() Scalar {
 	s := C.Mat_Mean(m.p)
 	return NewScalar(float64(s.val1), float64(s.val2), float64(s.val3), float64(s.val4))
@@ -598,7 +608,6 @@ func (m *Mat) Mean() Scalar {
 // MeanWithMask calculates the mean value M of array elements,independently for each channel,
 // and returns it as Scalar vector while applying the mask.
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga191389f8a0e58180bb13a727782cd461
-//
 func (m *Mat) MeanWithMask(mask Mat) Scalar {
 	s := C.Mat_MeanWithMask(m.p, mask.p)
 	return NewScalar(float64(s.val1), float64(s.val2), float64(s.val3), float64(s.val4))
@@ -608,7 +617,6 @@ func (m *Mat) MeanWithMask(mask Mat) Scalar {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga186222c3919657890f88df5a1f64a7d7
-//
 func (m *Mat) Sqrt() Mat {
 	return newMat(C.Mat_Sqrt(m.p))
 }
@@ -617,7 +625,6 @@ func (m *Mat) Sqrt() Mat {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga716e10a2dd9e228e4d3c95818f106722
-//
 func (m *Mat) Sum() Scalar {
 	s := C.Mat_Sum(m.p)
 	return NewScalar(float64(s.val1), float64(s.val2), float64(s.val3), float64(s.val4))
@@ -627,7 +634,6 @@ func (m *Mat) Sum() Scalar {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga62286befb7cde3568ff8c7d14d5079da
-//
 func (m *Mat) PatchNaNs() {
 	C.Mat_PatchNaNs(m.p)
 }
@@ -893,7 +899,6 @@ func (m *Mat) T() Mat {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga6fef31bc8c4071cbc114a758a2b79c14
-//
 func AbsDiff(src1, src2 Mat, dst *Mat) {
 	C.Mat_AbsDiff(src1.p, src2.p, dst.p)
 }
@@ -902,7 +907,6 @@ func AbsDiff(src1, src2 Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga10ac1bfb180e2cfda1701d06c24fdbd6
-//
 func Add(src1, src2 Mat, dst *Mat) {
 	C.Mat_Add(src1.p, src2.p, dst.p)
 }
@@ -911,7 +915,6 @@ func Add(src1, src2 Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gafafb2513349db3bcff51f54ee5592a19
-//
 func AddWeighted(src1 Mat, alpha float64, src2 Mat, beta float64, gamma float64, dst *Mat) {
 	C.Mat_AddWeighted(src1.p, C.double(alpha),
 		src2.p, C.double(beta), C.double(gamma), dst.p)
@@ -923,7 +926,6 @@ func AddWeighted(src1 Mat, alpha float64, src2 Mat, beta float64, gamma float64,
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga60b4d04b251ba5eb1392c34425497e14
-//
 func BitwiseAnd(src1 Mat, src2 Mat, dst *Mat) {
 	C.Mat_BitwiseAnd(src1.p, src2.p, dst.p)
 }
@@ -934,7 +936,6 @@ func BitwiseAnd(src1 Mat, src2 Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga60b4d04b251ba5eb1392c34425497e14
-//
 func BitwiseAndWithMask(src1 Mat, src2 Mat, dst *Mat, mask Mat) {
 	C.Mat_BitwiseAndWithMask(src1.p, src2.p, dst.p, mask.p)
 }
@@ -943,7 +944,6 @@ func BitwiseAndWithMask(src1 Mat, src2 Mat, dst *Mat, mask Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga0002cf8b418479f4cb49a75442baee2f
-//
 func BitwiseNot(src1 Mat, dst *Mat) {
 	C.Mat_BitwiseNot(src1.p, dst.p)
 }
@@ -952,7 +952,6 @@ func BitwiseNot(src1 Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga0002cf8b418479f4cb49a75442baee2f
-//
 func BitwiseNotWithMask(src1 Mat, dst *Mat, mask Mat) {
 	C.Mat_BitwiseNotWithMask(src1.p, dst.p, mask.p)
 }
@@ -962,7 +961,6 @@ func BitwiseNotWithMask(src1 Mat, dst *Mat, mask Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gab85523db362a4e26ff0c703793a719b4
-//
 func BitwiseOr(src1 Mat, src2 Mat, dst *Mat) {
 	C.Mat_BitwiseOr(src1.p, src2.p, dst.p)
 }
@@ -972,7 +970,6 @@ func BitwiseOr(src1 Mat, src2 Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gab85523db362a4e26ff0c703793a719b4
-//
 func BitwiseOrWithMask(src1 Mat, src2 Mat, dst *Mat, mask Mat) {
 	C.Mat_BitwiseOrWithMask(src1.p, src2.p, dst.p, mask.p)
 }
@@ -982,7 +979,6 @@ func BitwiseOrWithMask(src1 Mat, src2 Mat, dst *Mat, mask Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga84b2d8188ce506593dcc3f8cd00e8e2c
-//
 func BitwiseXor(src1 Mat, src2 Mat, dst *Mat) {
 	C.Mat_BitwiseXor(src1.p, src2.p, dst.p)
 }
@@ -992,7 +988,6 @@ func BitwiseXor(src1 Mat, src2 Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga84b2d8188ce506593dcc3f8cd00e8e2c
-//
 func BitwiseXorWithMask(src1 Mat, src2 Mat, dst *Mat, mask Mat) {
 	C.Mat_BitwiseXorWithMask(src1.p, src2.p, dst.p, mask.p)
 }
@@ -1001,7 +996,6 @@ func BitwiseXorWithMask(src1 Mat, src2 Mat, dst *Mat, mask Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga4ba778a1c57f83233b1d851c83f5a622
-//
 func BatchDistance(src1 Mat, src2 Mat, dist Mat, dtype MatType, nidx Mat, normType NormType, K int, mask Mat, update int, crosscheck bool) {
 	C.Mat_BatchDistance(src1.p, src2.p, dist.p, C.int(dtype), nidx.p, C.int(normType), C.int(K), mask.p, C.int(update), C.bool(crosscheck))
 }
@@ -1010,7 +1004,6 @@ func BatchDistance(src1 Mat, src2 Mat, dist Mat, dtype MatType, nidx Mat, normTy
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga247f571aa6244827d3d798f13892da58
-//
 func BorderInterpolate(p int, len int, borderType CovarFlags) int {
 	ret := C.Mat_BorderInterpolate(C.int(p), C.int(len), C.int(borderType))
 	return int(ret)
@@ -1020,7 +1013,6 @@ func BorderInterpolate(p int, len int, borderType CovarFlags) int {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d0/de1/group__core.html#ga719ebd4a73f30f4fab258ab7616d0f0f
-//
 type CovarFlags int
 
 const (
@@ -1047,7 +1039,6 @@ const (
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga017122d912af19d7d0d2cccc2d63819f
-//
 func CalcCovarMatrix(samples Mat, covar *Mat, mean *Mat, flags CovarFlags, ctype MatType) {
 	C.Mat_CalcCovarMatrix(samples.p, covar.p, mean.p, C.int(flags), C.int(ctype))
 }
@@ -1056,7 +1047,6 @@ func CalcCovarMatrix(samples Mat, covar *Mat, mean *Mat, flags CovarFlags, ctype
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gac5f92f48ec32cacf5275969c33ee837d
-//
 func CartToPolar(x Mat, y Mat, magnitude *Mat, angle *Mat, angleInDegrees bool) {
 	C.Mat_CartToPolar(x.p, y.p, magnitude.p, angle.p, C.bool(angleInDegrees))
 }
@@ -1065,7 +1055,6 @@ func CartToPolar(x Mat, y Mat, magnitude *Mat, angle *Mat, angleInDegrees bool) 
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga2bd19d89cae59361416736f87e3c7a64
-//
 func CheckRange(src Mat) bool {
 	return bool(C.Mat_CheckRange(src.p))
 }
@@ -1075,7 +1064,6 @@ func CheckRange(src Mat) bool {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga303cfb72acf8cbb36d884650c09a3a97
-//
 func Compare(src1 Mat, src2 Mat, dst *Mat, ct CompareType) {
 	C.Mat_Compare(src1.p, src2.p, dst.p, C.int(ct))
 }
@@ -1084,7 +1072,6 @@ func Compare(src1 Mat, src2 Mat, dst *Mat, ct CompareType) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaa4b89393263bb4d604e0fe5986723914
-//
 func CountNonZero(src Mat) int {
 	return int(C.Mat_CountNonZero(src.p))
 }
@@ -1093,7 +1080,6 @@ func CountNonZero(src Mat) int {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaa9d88dcd0e54b6d1af38d41f2a3e3d25
-//
 func CompleteSymm(m Mat, lowerToUpper bool) {
 	C.Mat_CompleteSymm(m.p, C.bool(lowerToUpper))
 }
@@ -1102,7 +1088,6 @@ func CompleteSymm(m Mat, lowerToUpper bool) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga3460e9c9f37b563ab9dd550c4d8c4e7d
-//
 func ConvertScaleAbs(src Mat, dst *Mat, alpha float64, beta float64) {
 	C.Mat_ConvertScaleAbs(src.p, dst.p, C.double(alpha), C.double(beta))
 }
@@ -1111,7 +1096,6 @@ func ConvertScaleAbs(src Mat, dst *Mat, alpha float64, beta float64) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga2ac1049c2c3dd25c2b41bffe17658a36
-//
 func CopyMakeBorder(src Mat, dst *Mat, top int, bottom int, left int, right int, bt BorderType, value color.RGBA) {
 
 	cValue := C.struct_Scalar{
@@ -1128,7 +1112,6 @@ func CopyMakeBorder(src Mat, dst *Mat, top int, bottom int, left int, right int,
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaf4dde112b483b38175621befedda1f1c
-//
 type DftFlags int
 
 const (
@@ -1166,7 +1149,6 @@ const (
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga85aad4d668c01fbd64825f589e3696d4
-//
 func DCT(src Mat, dst *Mat, flags DftFlags) {
 	C.Mat_DCT(src.p, dst.p, C.int(flags))
 }
@@ -1175,7 +1157,6 @@ func DCT(src Mat, dst *Mat, flags DftFlags) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaf802bd9ca3e07b8b6170645ef0611d0c
-//
 func Determinant(src Mat) float64 {
 	return float64(C.Mat_Determinant(src.p))
 }
@@ -1185,7 +1166,6 @@ func Determinant(src Mat) float64 {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gadd6cf9baf2b8b704a11b5f04aaf4f39d
-//
 func DFT(src Mat, dst *Mat, flags DftFlags) {
 	C.Mat_DFT(src.p, dst.p, C.int(flags))
 }
@@ -1195,7 +1175,6 @@ func DFT(src Mat, dst *Mat, flags DftFlags) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga6db555d30115642fedae0cda05604874
-//
 func Divide(src1 Mat, src2 Mat, dst *Mat) {
 	C.Mat_Divide(src1.p, src2.p, dst.p)
 }
@@ -1204,7 +1183,6 @@ func Divide(src1 Mat, src2 Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga9fa0d58657f60eaa6c71f6fbb40456e3
-//
 func Eigen(src Mat, eigenvalues *Mat, eigenvectors *Mat) bool {
 	ret := C.Mat_Eigen(src.p, eigenvalues.p, eigenvectors.p)
 	return bool(ret)
@@ -1214,9 +1192,16 @@ func Eigen(src Mat, eigenvalues *Mat, eigenvectors *Mat) bool {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaf51987e03cac8d171fbd2b327cf966f6
-//
 func EigenNonSymmetric(src Mat, eigenvalues *Mat, eigenvectors *Mat) {
 	C.Mat_EigenNonSymmetric(src.p, eigenvalues.p, eigenvectors.p)
+}
+
+// PCABackProject reconstructs vectors from their PC projections.
+//
+// For further details, please see:
+// https://docs.opencv.org/4.x/d2/de8/group__core__array.html#gab26049f30ee8e94f7d69d82c124faafc
+func PCABackProject(data Mat, mean Mat, eigenvectors Mat, result *Mat) {
+	C.Mat_PCABackProject(data.p, mean.p, eigenvectors.p, result.p)
 }
 
 // PCACompute performs PCA.
@@ -1228,16 +1213,46 @@ func EigenNonSymmetric(src Mat, eigenvalues *Mat, eigenvectors *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/4.x/d2/de8/group__core__array.html#ga27a565b31d820b05dcbcd47112176b6e
-//
 func PCACompute(src Mat, mean *Mat, eigenvectors *Mat, eigenvalues *Mat, maxComponents int) {
 	C.Mat_PCACompute(src.p, mean.p, eigenvectors.p, eigenvalues.p, C.int(maxComponents))
+}
+
+// PCAProject projects vector(s) to the principal component subspace.
+//
+// For further details, please see:
+// https://docs.opencv.org/4.x/d2/de8/group__core__array.html#ga6b9fbc7b3a99ebfd441bbec0a6bc4f88
+func PCAProject(data Mat, mean Mat, eigenvectors Mat, result *Mat) {
+	C.Mat_PCAProject(data.p, mean.p, eigenvectors.p, result.p)
+}
+
+// PSNR computes the Peak Signal-to-Noise Ratio (PSNR) image quality metric.
+//
+// For further details, please see:
+// https://docs.opencv.org/4.x/d2/de8/group__core__array.html#ga3119e3ea73010a6f810bb05aa36ac8d6
+func PSNR(src1 Mat, src2 Mat) float64 {
+	return float64(C.PSNR(src1.p, src2.p))
+}
+
+// SVBackSubst performs a singular value back substitution.
+//
+// For further details, please see:
+// https://docs.opencv.org/4.x/d2/de8/group__core__array.html#gab4e620e6fc6c8a27bb2be3d50a840c0b
+func SVBackSubst(w Mat, u Mat, vt Mat, rhs Mat, dst *Mat) {
+	C.SVBackSubst(w.p, u.p, vt.p, rhs.p, dst.p)
+}
+
+// SVDecomp decomposes matrix and stores the results to user-provided matrices.
+//
+// For further details, please see:
+// https://docs.opencv.org/4.x/d2/de8/group__core__array.html#gab477b5b7b39b370bb03e75b19d2d5109
+func SVDecomp(src Mat, w *Mat, u *Mat, vt *Mat) {
+	C.SVDecomp(src.p, w.p, u.p, vt.p)
 }
 
 // Exp calculates the exponent of every array element.
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga3e10108e2162c338f1b848af619f39e5
-//
 func Exp(src Mat, dst *Mat) {
 	C.Mat_Exp(src.p, dst.p)
 }
@@ -1246,7 +1261,6 @@ func Exp(src Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gacc6158574aa1f0281878c955bcf35642
-//
 func ExtractChannel(src Mat, dst *Mat, coi int) {
 	C.Mat_ExtractChannel(src.p, dst.p, C.int(coi))
 }
@@ -1255,7 +1269,6 @@ func ExtractChannel(src Mat, dst *Mat, coi int) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaed7df59a3539b4cc0fe5c9c8d7586190
-//
 func FindNonZero(src Mat, idx *Mat) {
 	C.Mat_FindNonZero(src.p, idx.p)
 }
@@ -1264,7 +1277,6 @@ func FindNonZero(src Mat, idx *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaca7be533e3dac7feb70fc60635adf441
-//
 func Flip(src Mat, dst *Mat, flipCode int) {
 	C.Mat_Flip(src.p, dst.p, C.int(flipCode))
 }
@@ -1273,7 +1285,6 @@ func Flip(src Mat, dst *Mat, flipCode int) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gacb6e64071dffe36434e1e7ee79e7cb35
-//
 func Gemm(src1, src2 Mat, alpha float64, src3 Mat, beta float64, dst *Mat, flags int) {
 	C.Mat_Gemm(src1.p, src2.p, C.double(alpha), src3.p, C.double(beta), dst.p, C.int(flags))
 }
@@ -1283,7 +1294,6 @@ func Gemm(src1, src2 Mat, alpha float64, src3 Mat, beta float64, dst *Mat, flags
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga6577a2e59968936ae02eb2edde5de299
-//
 func GetOptimalDFTSize(vecsize int) int {
 	return int(C.Mat_GetOptimalDFTSize(C.int(vecsize)))
 }
@@ -1292,7 +1302,6 @@ func GetOptimalDFTSize(vecsize int) int {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaab5ceee39e0580f879df645a872c6bf7
-//
 func Hconcat(src1, src2 Mat, dst *Mat) {
 	C.Mat_Hconcat(src1.p, src2.p, dst.p)
 }
@@ -1301,13 +1310,11 @@ func Hconcat(src1, src2 Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaab5ceee39e0580f879df645a872c6bf7
-//
 func Vconcat(src1, src2 Mat, dst *Mat) {
 	C.Mat_Vconcat(src1.p, src2.p, dst.p)
 }
 
 // RotateFlag for image rotation
-//
 //
 // For further details please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga6f45d55c0b1cc9d97f5353a7c8a7aac2
@@ -1334,7 +1341,6 @@ func Rotate(src Mat, dst *Mat, code RotateFlag) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga77b168d84e564c50228b69730a227ef2
-//
 func IDCT(src Mat, dst *Mat, flags int) {
 	C.Mat_Idct(src.p, dst.p, C.int(flags))
 }
@@ -1343,7 +1349,6 @@ func IDCT(src Mat, dst *Mat, flags int) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaa708aa2d2e57a508f968eb0f69aa5ff1
-//
 func IDFT(src Mat, dst *Mat, flags, nonzeroRows int) {
 	C.Mat_Idft(src.p, dst.p, C.int(flags), C.int(nonzeroRows))
 }
@@ -1352,7 +1357,6 @@ func IDFT(src Mat, dst *Mat, flags, nonzeroRows int) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga48af0ab51e36436c5d04340e036ce981
-//
 func InRange(src, lb, ub Mat, dst *Mat) {
 	C.Mat_InRange(src.p, lb.p, ub.p, dst.p)
 }
@@ -1361,7 +1365,6 @@ func InRange(src, lb, ub Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga48af0ab51e36436c5d04340e036ce981
-//
 func InRangeWithScalar(src Mat, lb, ub Scalar, dst *Mat) {
 	lbVal := C.struct_Scalar{
 		val1: C.double(lb.Val1),
@@ -1385,7 +1388,6 @@ func InRangeWithScalar(src Mat, lb, ub Scalar, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga1d4bd886d35b00ec0b764cb4ce6eb515
-//
 func InsertChannel(src Mat, dst *Mat, coi int) {
 	C.Mat_InsertChannel(src.p, dst.p, C.int(coi))
 }
@@ -1394,7 +1396,6 @@ func InsertChannel(src Mat, dst *Mat, coi int) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gad278044679d4ecf20f7622cc151aaaa2
-//
 func Invert(src Mat, dst *Mat, flags SolveDecompositionFlags) float64 {
 	ret := C.Mat_Invert(src.p, dst.p, C.int(flags))
 	return float64(ret)
@@ -1420,7 +1421,6 @@ const (
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d5/d38/group__core__cluster.html#ga9a34dc06c6ec9460e90860f15bcd2f88
-//
 func KMeans(data Mat, k int, bestLabels *Mat, criteria TermCriteria, attempts int, flags KMeansFlags, centers *Mat) float64 {
 	ret := C.KMeans(data.p, C.int(k), bestLabels.p, criteria.p, C.int(attempts), C.int(flags), centers.p)
 	return float64(ret)
@@ -1430,7 +1430,6 @@ func KMeans(data Mat, k int, bestLabels *Mat, criteria TermCriteria, attempts in
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d5/d38/group__core__cluster.html#ga9a34dc06c6ec9460e90860f15bcd2f88
-//
 func KMeansPoints(points PointVector, k int, bestLabels *Mat, criteria TermCriteria, attempts int, flags KMeansFlags, centers *Mat) float64 {
 	ret := C.KMeansPoints(points.p, C.int(k), bestLabels.p, criteria.p, C.int(attempts), C.int(flags), centers.p)
 	return float64(ret)
@@ -1440,7 +1439,6 @@ func KMeansPoints(points PointVector, k int, bestLabels *Mat, criteria TermCrite
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga937ecdce4679a77168730830a955bea7
-//
 func Log(src Mat, dst *Mat) {
 	C.Mat_Log(src.p, dst.p)
 }
@@ -1449,16 +1447,30 @@ func Log(src Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga6d3b097586bca4409873d64a90fe64c3
-//
 func Magnitude(x, y Mat, magnitude *Mat) {
 	C.Mat_Magnitude(x.p, y.p, magnitude.p)
+}
+
+// Mahalanobis calculates the Mahalanobis distance between two vectors.
+//
+// For further details, please see:
+// https://docs.opencv.org/4.x/d2/de8/group__core__array.html#ga4493aee129179459cbfc6064f051aa7d
+func Mahalanobis(v1, v2, icovar Mat) float64 {
+	return float64(C.Mat_Mahalanobis(v1.p, v2.p, icovar.p))
+}
+
+// MulTransposed calculates the product of a matrix and its transposition.
+//
+// For further details, please see:
+// https://docs.opencv.org/4.x/d2/de8/group__core__array.html#gadc4e49f8f7a155044e3be1b9e3b270ab
+func MulTransposed(src Mat, dest *Mat, ata bool) {
+	C.MulTransposed(src.p, dest.p, C.bool(ata))
 }
 
 // Max calculates per-element maximum of two arrays or an array and a scalar.
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gacc40fa15eac0fb83f8ca70b7cc0b588d
-//
 func Max(src1, src2 Mat, dst *Mat) {
 	C.Mat_Max(src1.p, src2.p, dst.p)
 }
@@ -1467,7 +1479,6 @@ func Max(src1, src2 Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga846c858f4004d59493d7c6a4354b301d
-//
 func MeanStdDev(src Mat, dst *Mat, dstStdDev *Mat) {
 	C.Mat_MeanStdDev(src.p, dst.p, dstStdDev.p)
 }
@@ -1476,7 +1487,6 @@ func MeanStdDev(src Mat, dst *Mat, dstStdDev *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga7d7b4d6c6ee504b30a20b1680029c7b4
-//
 func Merge(mv []Mat, dst *Mat) {
 	cMatArray := make([]C.Mat, len(mv))
 	for i, r := range mv {
@@ -1494,7 +1504,6 @@ func Merge(mv []Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga9af368f182ee76d0463d0d8d5330b764
-//
 func Min(src1, src2 Mat, dst *Mat) {
 	C.Mat_Min(src1.p, src2.p, dst.p)
 }
@@ -1503,7 +1512,6 @@ func Min(src1, src2 Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga7622c466c628a75d9ed008b42250a73f
-//
 func MinMaxIdx(input Mat) (minVal, maxVal float32, minIdx, maxIdx int) {
 	var cMinVal C.double
 	var cMaxVal C.double
@@ -1519,7 +1527,6 @@ func MinMaxIdx(input Mat) (minVal, maxVal float32, minIdx, maxIdx int) {
 //
 // For further details, please see:
 // https://docs.opencv.org/trunk/d2/de8/group__core__array.html#gab473bf2eb6d14ff97e89b355dac20707
-//
 func MinMaxLoc(input Mat) (minVal, maxVal float32, minLoc, maxLoc image.Point) {
 	var cMinVal C.double
 	var cMaxVal C.double
@@ -1534,11 +1541,28 @@ func MinMaxLoc(input Mat) (minVal, maxVal float32, minLoc, maxLoc image.Point) {
 	return float32(cMinVal), float32(cMaxVal), minLoc, maxLoc
 }
 
+// MinMaxLocWithMask finds the global minimum and maximum in an array with a mask used to select a sub-array.
+//
+// For further details, please see:
+// https://docs.opencv.org/4.x/d2/de8/group__core__array.html#gab473bf2eb6d14ff97e89b355dac20707
+func MinMaxLocWithMask(input, mask Mat) (minVal, maxVal float32, minLoc, maxLoc image.Point) {
+	var cMinVal C.double
+	var cMaxVal C.double
+	var cMinLoc C.struct_Point
+	var cMaxLoc C.struct_Point
+
+	C.Mat_MinMaxLocWithMask(input.p, &cMinVal, &cMaxVal, &cMinLoc, &cMaxLoc, mask.p)
+
+	minLoc = image.Pt(int(cMinLoc.x), int(cMinLoc.y))
+	maxLoc = image.Pt(int(cMaxLoc.x), int(cMaxLoc.y))
+
+	return float32(cMinVal), float32(cMaxVal), minLoc, maxLoc
+}
+
 // Copies specified channels from input arrays to the specified channels of output arrays.
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga51d768c270a1cdd3497255017c4504be
-//
 func MixChannels(src []Mat, dst []Mat, fromTo []int) {
 	cSrcArray := make([]C.Mat, len(src))
 	for i, r := range src {
@@ -1575,11 +1599,10 @@ func MixChannels(src []Mat, dst []Mat, fromTo []int) {
 	}
 }
 
-//Mulspectrums performs the per-element multiplication of two Fourier spectrums.
+// Mulspectrums performs the per-element multiplication of two Fourier spectrums.
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga3ab38646463c59bf0ce962a9d51db64f
-//
 func MulSpectrums(a Mat, b Mat, dst *Mat, flags DftFlags) {
 	C.Mat_MulSpectrums(a.p, b.p, dst.p, C.int(flags))
 }
@@ -1589,7 +1612,6 @@ func MulSpectrums(a Mat, b Mat, dst *Mat, flags DftFlags) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga979d898a58d7f61c53003e162e7ad89f
-//
 func Multiply(src1 Mat, src2 Mat, dst *Mat) {
 	C.Mat_Multiply(src1.p, src2.p, dst.p)
 }
@@ -1599,7 +1621,6 @@ func Multiply(src1 Mat, src2 Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga979d898a58d7f61c53003e162e7ad89f
-//
 func MultiplyWithParams(src1 Mat, src2 Mat, dst *Mat, scale float64, dtype MatType) {
 	C.Mat_MultiplyWithParams(src1.p, src2.p, dst.p, C.double(scale), C.int(dtype))
 }
@@ -1608,7 +1629,6 @@ func MultiplyWithParams(src1 Mat, src2 Mat, dst *Mat, scale float64, dtype MatTy
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gad12cefbcb5291cf958a85b4b67b6149f
-//
 type NormType int
 
 const (
@@ -1644,7 +1664,6 @@ const (
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga87eef7ee3970f86906d69a92cbf064bd
-//
 func Normalize(src Mat, dst *Mat, alpha float64, beta float64, typ NormType) {
 	C.Mat_Normalize(src.p, dst.p, C.double(alpha), C.double(beta), C.int(typ))
 }
@@ -1653,7 +1672,6 @@ func Normalize(src Mat, dst *Mat, alpha float64, beta float64, typ NormType) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga7c331fb8dd951707e184ef4e3f21dd33
-//
 func Norm(src1 Mat, normType NormType) float64 {
 	return float64(C.Norm(src1.p, C.int(normType)))
 }
@@ -1662,7 +1680,6 @@ func Norm(src1 Mat, normType NormType) float64 {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga7c331fb8dd951707e184ef4e3f21dd33
-//
 func NormWithMats(src1 Mat, src2 Mat, normType NormType) float64 {
 	return float64(C.NormWithMats(src1.p, src2.p, C.int(normType)))
 }
@@ -1671,7 +1688,6 @@ func NormWithMats(src1 Mat, src2 Mat, normType NormType) float64 {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gad327659ac03e5fd6894b90025e6900a7
-//
 func PerspectiveTransform(src Mat, dst *Mat, tm Mat) {
 	C.Mat_PerspectiveTransform(src.p, dst.p, tm.p)
 }
@@ -1680,7 +1696,6 @@ func PerspectiveTransform(src Mat, dst *Mat, tm Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d9/d5d/classcv_1_1TermCriteria.html#a56fecdc291ccaba8aad27d67ccf72c57
-//
 type TermCriteriaType int
 
 const (
@@ -1723,7 +1738,6 @@ const (
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga12b43690dbd31fed96f213eefead2373
-//
 func Solve(src1 Mat, src2 Mat, dst *Mat, flags SolveDecompositionFlags) bool {
 	return bool(C.Mat_Solve(src1.p, src2.p, dst.p, C.int(flags)))
 }
@@ -1732,7 +1746,6 @@ func Solve(src1 Mat, src2 Mat, dst *Mat, flags SolveDecompositionFlags) bool {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga1c3b0b925b085b6e96931ee309e6a1da
-//
 func SolveCubic(coeffs Mat, roots *Mat) int {
 	return int(C.Mat_SolveCubic(coeffs.p, roots.p))
 }
@@ -1741,7 +1754,6 @@ func SolveCubic(coeffs Mat, roots *Mat) int {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gac2f5e953016fabcdf793d762f4ec5dce
-//
 func SolvePoly(coeffs Mat, roots *Mat, maxIters int) float64 {
 	return float64(C.Mat_SolvePoly(coeffs.p, roots.p, C.int(maxIters)))
 }
@@ -1766,7 +1778,6 @@ const (
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga4b78072a303f29d9031d56e5638da78e
-//
 func Reduce(src Mat, dst *Mat, dim int, rType ReduceTypes, dType MatType) {
 	C.Mat_Reduce(src.p, dst.p, C.int(dim), C.int(rType), C.int(dType))
 }
@@ -1775,7 +1786,6 @@ func Reduce(src Mat, dst *Mat, dim int, rType ReduceTypes, dType MatType) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaa87ea34d99bcc5bf9695048355163da0
-//
 func ReduceArgMax(src Mat, dst *Mat, axis int, lastIndex bool) {
 	C.Mat_ReduceArgMax(src.p, dst.p, C.int(axis), C.bool(lastIndex))
 }
@@ -1784,7 +1794,6 @@ func ReduceArgMax(src Mat, dst *Mat, axis int, lastIndex bool) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaeecd548276bfb91b938989e66b722088
-//
 func ReduceArgMin(src Mat, dst *Mat, axis int, lastIndex bool) {
 	C.Mat_ReduceArgMin(src.p, dst.p, C.int(axis), C.bool(lastIndex))
 }
@@ -1793,7 +1802,6 @@ func ReduceArgMin(src Mat, dst *Mat, axis int, lastIndex bool) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga496c3860f3ac44c40b48811333cfda2d
-//
 func Repeat(src Mat, nY int, nX int, dst *Mat) {
 	C.Mat_Repeat(src.p, C.int(nY), C.int(nX), dst.p)
 }
@@ -1802,15 +1810,14 @@ func Repeat(src Mat, nY int, nX int, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga9e0845db4135f55dcf20227402f00d98
-//
 func ScaleAdd(src1 Mat, alpha float64, src2 Mat, dst *Mat) {
 	C.Mat_ScaleAdd(src1.p, C.double(alpha), src2.p, dst.p)
 }
 
 // SetIdentity initializes a scaled identity matrix.
 // For further details, please see:
-//  https://docs.opencv.org/master/d2/de8/group__core__array.html#ga388d7575224a4a277ceb98ccaa327c99
 //
+//	https://docs.opencv.org/master/d2/de8/group__core__array.html#ga388d7575224a4a277ceb98ccaa327c99
 func SetIdentity(src Mat, scalar float64) {
 	C.Mat_SetIdentity(src.p, C.double(scalar))
 }
@@ -1835,7 +1842,6 @@ const (
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga45dd56da289494ce874be2324856898f
-//
 func Sort(src Mat, dst *Mat, flags SortFlags) {
 	C.Mat_Sort(src.p, dst.p, C.int(flags))
 }
@@ -1845,7 +1851,6 @@ func Sort(src Mat, dst *Mat, flags SortFlags) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gadf35157cbf97f3cb85a545380e383506
-//
 func SortIdx(src Mat, dst *Mat, flags SortFlags) {
 	C.Mat_SortIdx(src.p, dst.p, C.int(flags))
 }
@@ -1855,7 +1860,6 @@ func SortIdx(src Mat, dst *Mat, flags SortFlags) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga0547c7fed86152d7e9d0096029c8518a
-//
 func Split(src Mat) (mv []Mat) {
 	cMats := C.struct_Mats{}
 	C.Mat_Split(src.p, &(cMats))
@@ -1872,7 +1876,6 @@ func Split(src Mat) (mv []Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaa0f00d98b4b5edeaeb7b8333b2de353b
-//
 func Subtract(src1 Mat, src2 Mat, dst *Mat) {
 	C.Mat_Subtract(src1.p, src2.p, dst.p)
 }
@@ -1881,7 +1884,6 @@ func Subtract(src1 Mat, src2 Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga3419ac19c7dcd2be4bd552a23e147dd8
-//
 func Trace(src Mat) Scalar {
 	s := C.Mat_Trace(src.p)
 	return NewScalar(float64(s.val1), float64(s.val2), float64(s.val3), float64(s.val4))
@@ -1891,7 +1893,6 @@ func Trace(src Mat) Scalar {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga393164aa54bb9169ce0a8cc44e08ff22
-//
 func Transform(src Mat, dst *Mat, tm Mat) {
 	C.Mat_Transform(src.p, dst.p, tm.p)
 }
@@ -1900,7 +1901,6 @@ func Transform(src Mat, dst *Mat, tm Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga46630ed6c0ea6254a35f447289bd7404
-//
 func Transpose(src Mat, dst *Mat) {
 	C.Mat_Transpose(src.p, dst.p)
 }
@@ -1909,7 +1909,6 @@ func Transpose(src Mat, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaf0d056b5bd1dc92500d6f6cf6bac41ef
-//
 func Pow(src Mat, power float64, dst *Mat) {
 	C.Mat_Pow(src.p, C.double(power), dst.p)
 }
@@ -1918,7 +1917,6 @@ func Pow(src Mat, power float64, dst *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga581ff9d44201de2dd1b40a50db93d665
-//
 func PolarToCart(magnitude Mat, degree Mat, x *Mat, y *Mat, angleInDegrees bool) {
 	C.Mat_PolarToCart(magnitude.p, degree.p, x.p, y.p, C.bool(angleInDegrees))
 }
@@ -1927,7 +1925,6 @@ func PolarToCart(magnitude Mat, degree Mat, x *Mat, y *Mat, angleInDegrees bool)
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga9db9ca9b4d81c3bde5677b8f64dc0137
-//
 func Phase(x, y Mat, angle *Mat, angleInDegrees bool) {
 	C.Mat_Phase(x.p, y.p, angle.p, C.bool(angleInDegrees))
 }
@@ -1936,7 +1933,6 @@ func Phase(x, y Mat, angle *Mat, angleInDegrees bool) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d9/d5d/classcv_1_1TermCriteria.html
-//
 type TermCriteria struct {
 	p C.TermCriteria
 }
@@ -1950,7 +1946,6 @@ func NewTermCriteria(typ TermCriteriaType, maxCount int, epsilon float64) TermCr
 //
 // For further details, please see:
 // http://docs.opencv.org/master/d1/da0/classcv_1_1Scalar__.html
-//
 type Scalar struct {
 	Val1 float64
 	Val2 float64
@@ -1968,7 +1963,6 @@ func NewScalar(v1 float64, v2 float64, v3 float64, v4 float64) Scalar {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/d29/classcv_1_1KeyPoint.html
-//
 type KeyPoint struct {
 	X, Y                  float64
 	Size, Angle, Response float64
@@ -1979,7 +1973,6 @@ type KeyPoint struct {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d4/de0/classcv_1_1DMatch.html#a546ddb9a87898f06e510e015a6de596e
-//
 type DMatch struct {
 	QueryIdx int
 	TrainIdx int
@@ -2330,7 +2323,6 @@ func (pfv Point2fVector) Close() {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/db/de0/group__core__utils.html#gae73f58000611a1af25dd36d496bf4487
-//
 func GetTickCount() float64 {
 	return float64(C.GetCVTickCount())
 }
@@ -2339,7 +2331,6 @@ func GetTickCount() float64 {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/db/de0/group__core__utils.html#ga705441a9ef01f47acdc55d87fbe5090c
-//
 func GetTickFrequency() float64 {
 	return float64(C.GetTickFrequency())
 }
@@ -2436,7 +2427,6 @@ func toCStrings(strs []string) C.struct_CStrings {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d3/d63/classcv_1_1Mat.html#aa6542193430356ad631a9beabc624107
-//
 func (m *Mat) RowRange(start, end int) Mat {
 	return newMat(C.Mat_rowRange(m.p, C.int(start), C.int(end)))
 }
@@ -2445,7 +2435,6 @@ func (m *Mat) RowRange(start, end int) Mat {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d3/d63/classcv_1_1Mat.html#aadc8f9210fe4dec50513746c246fa8d9
-//
 func (m *Mat) ColRange(start, end int) Mat {
 	return newMat(C.Mat_colRange(m.p, C.int(start), C.int(end)))
 }
@@ -2457,7 +2446,6 @@ func (m *Mat) ColRange(start, end int) Mat {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d1/dd6/classcv_1_1RNG.html
-//
 type RNG struct {
 	p C.RNG
 }
@@ -2475,7 +2463,6 @@ const (
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga75843061d150ad6564b5447e38e57722
-//
 func TheRNG() RNG {
 	return RNG{
 		p: C.TheRNG(),
@@ -2486,7 +2473,6 @@ func TheRNG() RNG {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga757e657c037410d9e19e819569e7de0f
-//
 func SetRNGSeed(seed int) {
 	C.SetRNGSeed(C.int(seed))
 }
@@ -2495,7 +2481,6 @@ func SetRNGSeed(seed int) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d1/dd6/classcv_1_1RNG.html#ad26f2b09d9868cf108e84c9814aa682d
-//
 func (r *RNG) Fill(mat *Mat, distType RNGDistType, a, b float64, saturateRange bool) {
 	C.RNG_Fill(r.p, mat.p, C.int(distType), C.double(a), C.double(b), C.bool(saturateRange))
 }
@@ -2505,7 +2490,6 @@ func (r *RNG) Fill(mat *Mat, distType RNGDistType, a, b float64, saturateRange b
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d1/dd6/classcv_1_1RNG.html#a8df8ce4dc7d15916cee743e5a884639d
-//
 func (r *RNG) Gaussian(sigma float64) float64 {
 	return float64(C.RNG_Gaussian(r.p, C.double(sigma)))
 }
@@ -2515,7 +2499,6 @@ func (r *RNG) Gaussian(sigma float64) float64 {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d1/dd6/classcv_1_1RNG.html#a8df8ce4dc7d15916cee743e5a884639d
-//
 func (r *RNG) Next() uint {
 	return uint(C.RNG_Next(r.p))
 }
@@ -2524,7 +2507,6 @@ func (r *RNG) Next() uint {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#gaeff1f61e972d133a04ce3a5f81cf6808
-//
 func RandN(mat *Mat, mean, stddev Scalar) {
 	meanVal := C.struct_Scalar{
 		val1: C.double(mean.Val1),
@@ -2546,7 +2528,6 @@ func RandN(mat *Mat, mean, stddev Scalar) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga6a789c8a5cb56c6dd62506179808f763
-//
 func RandShuffle(mat *Mat) {
 	C.RandShuffle(mat.p)
 }
@@ -2555,7 +2536,6 @@ func RandShuffle(mat *Mat) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga6a789c8a5cb56c6dd62506179808f763
-//
 func RandShuffleWithParams(mat *Mat, iterFactor float64, rng RNG) {
 	C.RandShuffleWithParams(mat.p, C.double(iterFactor), rng.p)
 }
@@ -2565,7 +2545,6 @@ func RandShuffleWithParams(mat *Mat, iterFactor float64, rng RNG) {
 //
 // For further details, please see:
 // https://docs.opencv.org/master/d2/de8/group__core__array.html#ga1ba1026dca0807b27057ba6a49d258c0
-//
 func RandU(mat *Mat, low, high Scalar) {
 	lowVal := C.struct_Scalar{
 		val1: C.double(low.Val1),
